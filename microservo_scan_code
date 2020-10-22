@@ -2,6 +2,9 @@
 # By: COVID_Killer_Robot Team
 # Thu Oct 22 2020
 
+# Using the mini pan tilt, and Maixduino pin number 9
+# The servo should move about 180 degrees
+
 import time, sys
 from machine import Timer,PWM
 from fpioa_manager import board_info
