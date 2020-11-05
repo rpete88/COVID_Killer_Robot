@@ -1,0 +1,26 @@
+<annotation verified="yes">
+	<folder>imgs</folder>
+	<filename>desk_016.jpg</filename>
+	<path>/Users/ryanm/Gits/COVID_Killer_Robot/training/imgs/desk_016.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>259</width>
+		<height>194</height>
+		<depth>24</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>desk_016.jpg</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>33</xmin>
+			<ymin>1</ymin>
+			<xmax>218</xmax>
+			<ymax>192</ymax>
+		</bndbox>
+	</object>
+</annotation>
