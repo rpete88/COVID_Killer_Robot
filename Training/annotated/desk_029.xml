@@ -1,7 +1,7 @@
 <annotation verified="yes">
 	<folder>imgs</folder>
 	<filename>desk_029.jpg</filename>
-	<path>/Users/ryanm/Gits/COVID_Killer_Robot/training/imgs/desk_029.jpg</path>
+	<path>/home/rpete/Design/desk_dataset/imgs</path>
 	<source>
 		<database>Unknown</database>
 	</source>

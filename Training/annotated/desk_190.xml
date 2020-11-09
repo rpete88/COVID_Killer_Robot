@@ -1,7 +1,7 @@
 <annotation verified="yes">
 	<folder>images</folder>
 	<filename>desk_190.jpg</filename>
-	<path>C:\Users\rpete\Documents\SeniorYear\Design\MaixPy_IDE\Training\imgs</path>
+	<path>/home/rpete/Design/desk_dataset/imgs</path>
 	<source>
 		<database>Unknown</database>
 	</source>
