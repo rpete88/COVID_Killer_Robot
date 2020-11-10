@@ -53,18 +53,6 @@
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin></xmin>
-			<ymin></ymin>
-			<xmax></xmax>
-			<ymax></ymax>
-		</bndbox>
-	</object>
-	<object>
-		<name>desk</name>
-		<pose>Unspecified</pose>
-		<truncated>0</truncated>
-		<difficult>0</difficult>
-		<bndbox>
 			<xmin>14</xmin>
 			<ymin>70</ymin>
 			<xmax>72</xmax>
@@ -117,18 +105,6 @@
 			<ymin>73</ymin>
 			<xmax>264</xmax>
 			<ymax>134</ymax>
-		</bndbox>
-	</object>
-	<object>
-		<name>desk</name>
-		<pose>Unspecified</pose>
-		<truncated>0</truncated>
-		<difficult>0</difficult>
-		<bndbox>
-			<xmin></xmin>
-			<ymin></ymin>
-			<xmax></xmax>
-			<ymax></ymax>
 		</bndbox>
 	</object>
 	<object>
