@@ -14,11 +14,17 @@ weights.kmodel
 flash-list_full.json
   json file for full version of maixpy v0.5.1
 
-flash-list.json
+flash-list_minimum.json
   json file for minimum version of maixpy v0.5.1
+
+  flash-list.json
+    json file for minimum version of maixpy v0.4.0
 
 maixpy_v0.5.1_103_gf9bb0bb.bin
   maixpy full version
 
 maixpy_v0.5.1_103_gf9bb0bb_minimum.bin
   maixpy minimum version
+
+maixpy_v0.4.0_52_g3b8c18b.bin
+  maixpy previous version
