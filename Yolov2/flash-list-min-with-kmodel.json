@@ -3,12 +3,12 @@
   "files": [
     {
       "address": 0,
-      "bin": "maixpy_v0.5.1_103_gf9bb0bb.bin",
+      "bin": "maixpy_7bf6445_minimum_with_kmodel_v4_support.bin",
       "sha256Prefix": true
     },
     {
       "address": 0x300000,
-      "bin": "deskv2beta4.kmodel",
+      "bin": "desk.kmodel",
       "sha256Prefix": false
     }
   ]

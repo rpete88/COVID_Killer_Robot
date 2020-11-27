@@ -31,8 +31,12 @@ model_v0.5.1.kfpkg
 ____________________________________________________________
   kmodel FILES
 ____________________________________________________________
+deskv2beta4.kmodel
+  Model for detecting desks using nncase v0.2.0 beta4
+  This version of nncase is believed to give us kmodel v4
+
 desk.kmodel
-  Our latest model for detecting desks
+  Model for detecting desks using nncase v0.1.0-rc5
 
 weights.kmodel
   A previous model for detecting desks
@@ -42,7 +46,7 @@ ____________________________________________________________
   JSON FILES
 ____________________________________________________________
 
-flash-list.json
+flash-list_v0.3.2.json
   json file for minimum version of maixpy v0.3.2
 
 flash-list_v0.5.1.json
