@@ -3,7 +3,7 @@
   "files": [
     {
       "address": 0,
-      "bin": "maixpy_7bf6445_minimum_with_kmodel_v4_support.bin",
+      "bin": "maixpy_v0.3.2_full.bin",
       "sha256Prefix": true
     },
     {
