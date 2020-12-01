@@ -8,12 +8,17 @@ ____________________________________________________________
   kfpkg FILES - what we actually flash to board
 ____________________________________________________________
 
-model_v0.5.1_nncasev2b2.kfpkg
+model_v0.6.0_v2beta.kfpkg
+  MaixPy latest release bin minimum with kmodel v4 support
+  nncase v0.2.0 Beta2
+  ValueError: [MAIXPY]kpu: load error:2002, ERR_KMODEL_VERSION: only support kmodel V3/V4 now
+
+model_v0.5.1_v2beta2.kfpkg
   Converts from flite to kmodel using nncase v0.2.0 Beta2
   Problem: Unsuccessful load, same issue we have been getting
   ValueError: [MAIXPY]kpu: load error:2002, ERR_KMODEL_VERSION: only support kmodel V3/V4 now
 
-model_v0.5.1_nncasev2b4.kfpkg
+model_v0.5.1_v2beta4.kfpkg
   Converts from flite to kmodel using nncase v0.2.0 Beta4
   Problem: Unsuccessful load, https://github.com/sipeed/MaixPy/issues/256, trying beta2 instead
 
