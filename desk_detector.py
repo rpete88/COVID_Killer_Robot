@@ -10,7 +10,7 @@ sensor.set_windowing((224, 224))
 sensor.set_vflip(1)
 sensor.run(1)
 print("after sensor statements")
-classes = ["desk"]
+classes = ["desks"]
 print("test1")
 task = kpu.load(0xd00000) #change to "/sd/name_of_the_model_file.kmodel" if loading from SD card
 print("test2")
