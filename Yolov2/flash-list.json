@@ -8,7 +8,7 @@
     },
     {
       "address": 0x300000,
-      "bin": "deskv2beta2.kmodel",
+      "bin": "YOLO_best_mAP.kmodel",
       "sha256Prefix": false
     }
   ]

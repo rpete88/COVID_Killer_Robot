@@ -4,6 +4,7 @@
 import sensor, image, lcd, time
 import KPU as kpu
 import gc, sys
+print("DESK DETECTOR")
 
 def lcd_show_except(e):
     import uio
@@ -14,7 +15,7 @@ def lcd_show_except(e):
     img.draw_string(0, 10, err_str, scale=1, color=(0xff,0x00,0x00))
     lcd.display(img)
 
-def main(anchors, labels = None, model_addr=0xd00000, sensor_window=(224, 224), lcd_rotation=0, sensor_hmirror=False, sensor_vflip=False):
+def main(anchors, labels = None, model_addr=0x200000, sensor_window=(224, 224), lcd_rotation=0, sensor_hmirror=False, sensor_vflip=False):
     sensor.reset()
     sensor.set_pixformat(sensor.RGB565)
     sensor.set_framesize(sensor.QVGA)
@@ -22,7 +23,6 @@ def main(anchors, labels = None, model_addr=0xd00000, sensor_window=(224, 224), 
     sensor.set_hmirror(sensor_hmirror)
     sensor.set_vflip(sensor_vflip)
     sensor.run(1)
-
     lcd.init(type=1)
     lcd.rotation(lcd_rotation)
     lcd.clear(lcd.WHITE)
@@ -57,9 +57,11 @@ def main(anchors, labels = None, model_addr=0xd00000, sensor_window=(224, 224), 
                     pos = obj.rect()
                     img.draw_rectangle(pos)
                     img.draw_string(pos[0], pos[1], "%s : %.2f" %(labels[obj.classid()], obj.value()), scale=2, color=(255, 0, 0))
+                    save = img
             img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
             lcd.display(img)
     except Exception as e:
+        print(e)
         raise e
     finally:
         kpu.deinit(task)
@@ -69,8 +71,8 @@ if __name__ == "__main__":
     try:
         labels = ["desks"]
         anchors = [1.8504418134689333, 1.2593817710876465, 2.9977920055389404, 3.847682237625122, 5.92604923248291, 4.488962650299072, 6.478476762771606, 6.562475204467773, 3.07891845703125, 1.9586095809936523]
-        # main(anchors = anchors, labels=labels, model_addr=0x300000, lcd_rotation=0)
-        main(anchors = anchors, labels=labels, model_addr=0xd00000)
+        # main(anchors = anchors, labels=labels, model_addr=0x200000, lcd_rotation=0)
+        main(anchors = anchors, labels=labels, model_addr=0x200000)
     except Exception as e:
         sys.print_exception(e)
         lcd_show_except(e)
