@@ -1,0 +1,48 @@
+{
+    "asset": {
+        "format": "jpg",
+        "id": "8acb9bb1e63bb18469b4112df58d4486",
+        "name": "desk_148.jpg",
+        "path": "file:C:/Users/ryanm/OneDrive/Desktop/CKRmodel/imgs/desk_148.jpg",
+        "size": {
+            "width": 224,
+            "height": 224
+        },
+        "state": 2,
+        "type": 1
+    },
+    "regions": [
+        {
+            "id": "yKQ4k0lEk",
+            "type": "RECTANGLE",
+            "tags": [
+                "desks"
+            ],
+            "boundingBox": {
+                "height": 46.48122865790563,
+                "width": 124.85650836868791,
+                "left": 25.52759759157699,
+                "top": 118.92274485202815
+            },
+            "points": [
+                {
+                    "x": 25.52759759157699,
+                    "y": 118.92274485202815
+                },
+                {
+                    "x": 150.3841059602649,
+                    "y": 118.92274485202815
+                },
+                {
+                    "x": 150.3841059602649,
+                    "y": 165.4039735099338
+                },
+                {
+                    "x": 25.52759759157699,
+                    "y": 165.4039735099338
+                }
+            ]
+        }
+    ],
+    "version": "2.2.0"
+}
