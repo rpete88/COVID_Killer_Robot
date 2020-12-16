@@ -1,0 +1,26 @@
+<annotation verified="yes">
+	<folder>imgs</folder>
+	<filename>desk_020.jpg</filename>
+	<path>/home/rpete/Design/desk_dataset/imgs/desk_020.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>550</width>
+		<height>533</height>
+		<depth>24</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>desk</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>7</xmin>
+			<ymin>5</ymin>
+			<xmax>540</xmax>
+			<ymax>528</ymax>
+		</bndbox>
+	</object>
+</annotation>
