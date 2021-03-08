@@ -12,7 +12,7 @@ sensor.run(1)
 print("after sensor statements")
 classes = ["desks"]
 print("test1")
-task = kpu.load(0xd00000) #change to "/sd/name_of_the_model_file.kmodel" if loading from SD card
+task = kpu.load(0x300000) #change to "/sd/name_of_the_model_file.kmodel" if loading from SD card
 print("test2")
 a = kpu.set_outputs(task, 0, 7,7,30)   #the actual shape needs to match the last layer shape of your model(before Reshape)
 print("test3")
