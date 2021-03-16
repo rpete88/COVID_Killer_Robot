@@ -40,8 +40,8 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
     lcd.clear(lcd.WHITE)
 
     # Set up timer, PWM, and servo
-    ultrasonicLeft = HCSR04(trigpin = 10, echopin = 3) # pin 12 and pin 13
-    ultrasonicRight = HCSR04(trigpin = 12, echopin = 11) # pin 10 and 11
+    ultrasonicLeft = HCSR04(trigpin=10, echopin=3, FMGPIOTrig=fm.fpioa.GPIO0, FMGPIOEcho=fm.fpioa.GPIO1, GPIOTrig=GPIO.GPIO0, GPIOEcho=GPIO.GPIO1) #pin 12, 13 = board_info.D[12], board_info.D[13]
+    ultrasonicRight = HCSR04(trigpin=12, echopin=11, FMGPIOTrig=fm.fpioa.GPIO2, FMGPIOEcho=fm.fpioa.GPIO3, GPIOTrig=GPIO.GPIO2, GPIOEcho=GPIO.GPIO3) #pin 10, 11 = board_info.D[10], board_info.D[11]
 
     tim0 = Timer(Timer.TIMER0, Timer.CHANNEL0, mode = Timer.MODE_PWM)
     tim1 = Timer(Timer.TIMER1, Timer.CHANNEL1, mode = Timer.MODE_PWM)
