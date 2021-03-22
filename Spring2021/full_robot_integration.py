@@ -49,7 +49,7 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
 
     leftWheelServo = PWM(tim0, freq = 50, duty = 7.32, pin = 14) #pin 8
     rightWheelServo = PWM(tim1, freq = 50, duty = 7.4, pin = 13) #pin 9
-    scanPWM = PWM(tim2, freq=50, duty=0, pin = 12) # find a pin to use
+    scanPWM = PWM(tim2, freq=50, duty=0, pin = 15) # find a pin to use
 
     scanServo = Servo(scanPWM, dir=80)
     increment = 5 # value to increment the microservo (unit is degrees)
@@ -98,8 +98,8 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
         kpu.init_yolo2(task, 0.5, 0.3, 5, anchors) # threshold:[0,1], nms_value: [0, 1]
         while(True):
             # Ultasonic Readings
-            ultrasonicLeft.distance_in()
-            ultrasonicRight.distance_in()
+            # ultrasonicLeft.distance_in()
+            # ultrasonicRight.distance_in()
             # Take screenshot and run yolo2 on image
             img = sensor.snapshot()
             t = time.ticks_ms()
@@ -118,6 +118,7 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
             img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
             lcd.display(img)
             if objects:
+                stop()
                 time.sleep(1)
 
             # Increment the scan servo
