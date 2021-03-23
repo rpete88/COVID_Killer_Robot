@@ -8,6 +8,7 @@ PWMHIGH = 10
 
 from machine import Timer, PWM
 #from fpioa_manager import board_info
+from fpioa_manager import fm
 from Maix import GPIO
 from board import board_info
 import machine, sensor, image, lcd, time
@@ -102,6 +103,7 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
             # ultrasonicRight.distance_in()
             # Take screenshot and run yolo2 on image
             img = sensor.snapshot()
+            img.rotation_corr(0,0,90,0,0,1)
             t = time.ticks_ms()
             objects = kpu.run_yolo2(task, img)
             t = time.ticks_ms() - t
