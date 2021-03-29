@@ -72,6 +72,20 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
         leftWheelServo.duty(PWMHIGH)
         rightWheelServo.duty(PWMLOW)
 
+    def driveForwardSlow():
+        leftWheelServo.duty(9)
+        rightWheelServo.duty(5.5)
+
+    def slightAdjustRight():
+        leftWheelServo.duty(PWMHIGH)
+        rightWheelServo.duty(PWMHIGH)
+        time.sleep_ms(5)
+
+    def slightAdjustLeft():
+        leftWheelServo.duty(PWMLOW)
+        rightWheelServo.duty(PWMLOW)
+        time.sleep_ms(5)
+
     def stop():
         leftWheelServo.duty(7.40)
         rightWheelServo.duty(7.40)
@@ -120,31 +134,50 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
             img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
             lcd.display(img)
             if objects:
-                stop()
-                time.sleep(1)
+                for obj in objects:
+                    nextPos = obj.rect()
+                if scanServo.value == 50:
+                    driveForwardSlow()
+                    if nextPos[0] > pos[0]:
+                        slightAdjustRight()
+                    elif nextPos[0] < pos[0]:
+                        slightAdjustLeft()
+                    #here will be where we tilt the camera forward
+                    #if nextPos[1] > pos[1]:
+                    #
+                    #elif nextPos[1] < pos[1]:
+                    #
+                    if nextPos[2] > 175:
+                        stop()
+                        time.sleep(10)
+                    else:
+                        driveForwardSlow()
+                elif scanServo.value > 50:
+                    slightAdjustRight()
+                    scanServo.drive(scanServo.value - 5)
+                elif scanServo.value < 50:
+                    slightAdjustLeft()
+                    scanServo.drive(scanServo.value + 5)
+            else:
+                # Increment the scan servo
+                scanServo.drive(increment)
+                # Modify the increment value if necessary
+                if (scanServo.value == 100 ):
+                    increment = -5
+                if (scanServo.value == 0 ):
+                    increment = 5
 
-            # Increment the scan servo
-            scanServo.drive(increment)
-            # Modify the increment value if necessary
-            if (scanServo.value == 100 ):
-                increment = -5
-            if (scanServo.value == 0 ):
-                increment = 5
-
-            # Control Robot based on ultrasonic readings
-            if(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
-                stop()
-                time.sleep_ms(500)
-                turnRight()
-            elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
-                driveForward()
-            elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
-                turnLeft()
-            elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
-                turnRight()
-
-            time.sleep_ms(250)
-
+                # Control Robot based on ultrasonic readings
+                if(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
+                    stop()
+                    time.sleep_ms(500)
+                    turnRight()
+                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
+                    driveForward()
+                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
+                    turnLeft()
+                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
+                    turnRight()
 
     except Exception as e:
         print(e)
