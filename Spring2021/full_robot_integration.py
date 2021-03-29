@@ -53,7 +53,7 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
     scanPWM = PWM(tim2, freq=50, duty=0, pin = 15) # find a pin to use
 
     scanServo = Servo(scanPWM, dir=80)
-    increment = 5 # value to increment the microservo (unit is degrees)
+    increment = 1 # value to increment the microservo (unit is degrees)
 
     '''
     Functions to control servos
@@ -79,12 +79,10 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
     def slightAdjustRight():
         leftWheelServo.duty(PWMHIGH)
         rightWheelServo.duty(PWMHIGH)
-        time.sleep_ms(5)
 
     def slightAdjustLeft():
         leftWheelServo.duty(PWMLOW)
         rightWheelServo.duty(PWMLOW)
-        time.sleep_ms(5)
 
     def stop():
         leftWheelServo.duty(7.40)
@@ -117,7 +115,6 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
             # ultrasonicRight.distance_in()
             # Take screenshot and run yolo2 on image
             img = sensor.snapshot()
-            img.rotation_corr(0,0,90,0,0,1)
             t = time.ticks_ms()
             objects = kpu.run_yolo2(task, img)
             t = time.ticks_ms() - t
@@ -133,11 +130,14 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
                     save = img
             img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
             lcd.display(img)
+            img = sensor.snapshot()
+            t = time.ticks_ms()
+            objects = kpu.run_yolo2(task, img)
+            t = time.ticks_ms() - t
             if objects:
                 for obj in objects:
                     nextPos = obj.rect()
-                if scanServo.value == 50:
-                    driveForwardSlow()
+                if scanServo.value >= 48 and scanServo.value <=52:
                     if nextPos[0] > pos[0]:
                         slightAdjustRight()
                     elif nextPos[0] < pos[0]:
@@ -152,20 +152,20 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
                         time.sleep(10)
                     else:
                         driveForwardSlow()
-                elif scanServo.value > 50:
+                elif scanServo.value > 52:
                     slightAdjustRight()
-                    scanServo.drive(scanServo.value - 5)
-                elif scanServo.value < 50:
+                    scanServo.drive(-2)
+                elif scanServo.value < 48:
                     slightAdjustLeft()
-                    scanServo.drive(scanServo.value + 5)
+                    scanServo.drive(2)
             else:
                 # Increment the scan servo
                 scanServo.drive(increment)
                 # Modify the increment value if necessary
                 if (scanServo.value == 100 ):
-                    increment = -5
+                    increment = -1
                 if (scanServo.value == 0 ):
-                    increment = 5
+                    increment = 1
 
                 # Control Robot based on ultrasonic readings
                 if(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
@@ -178,6 +178,7 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
                     turnLeft()
                 elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
                     turnRight()
+
 
     except Exception as e:
         print(e)
