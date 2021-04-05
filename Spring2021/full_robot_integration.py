@@ -48,42 +48,41 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
     tim1 = Timer(Timer.TIMER1, Timer.CHANNEL1, mode = Timer.MODE_PWM)
     tim2 = Timer(Timer.TIMER0, Timer.CHANNEL1, mode = Timer.MODE_PWM)
 
-    leftWheelServo = PWM(tim0, freq = 50, duty = 7.32, pin = 14) #pin 8
-    rightWheelServo = PWM(tim1, freq = 50, duty = 7.4, pin = 13) #pin 9
-    scanPWM = PWM(tim2, freq=50, duty=0, pin = 15) # find a pin to use
+    leftWheelServo = PWM(tim0, freq = 50, duty = 7.32, pin = 14) # pin 8
+    rightWheelServo = PWM(tim1, freq = 50, duty = 7.4, pin = 13) # pin 9
+    scanPWM = PWM(tim2, freq=50, duty=0, pin = 15) # pin 7
 
     scanServo = Servo(scanPWM, dir=80)
     increment = 1 # value to increment the microservo (unit is degrees)
 
     '''
-    Functions to control servos
+    Helper Functions to adjust wheel servos 
     '''
+    # turns the robot right
     def turnRight():
         leftWheelServo.duty(PWMHIGH)
         rightWheelServo.duty(PWMHIGH)
-        time.sleep_ms(500)
-
+    # turns the robot left
     def turnLeft():
         leftWheelServo.duty(PWMLOW)
         rightWheelServo.duty(PWMLOW)
-        time.sleep_ms(500)
-
+    # sets the duty cycle of left and right wheel servos to go forward
     def driveForward():
         leftWheelServo.duty(PWMHIGH)
         rightWheelServo.duty(PWMLOW)
-
+    # sets the duty cycle of left and right wheel servos to go forward slowly
     def driveForwardSlow():
         leftWheelServo.duty(9)
         rightWheelServo.duty(5.5)
-
+    # sets the duty cycle of left and right wheel servos to go right
     def slightAdjustRight():
-        leftWheelServo.duty(PWMHIGH)
-        rightWheelServo.duty(PWMHIGH)
-
+        leftWheelServo.duty(9)
+        rightWheelServo.duty(9)
+    # sets the duty cycle of left and right wheel servos to go left
     def slightAdjustLeft():
-        leftWheelServo.duty(PWMLOW)
-        rightWheelServo.duty(PWMLOW)
-
+        leftWheelServo.duty(5.5)
+        rightWheelServo.duty(5.5)
+    # sets the duty cycle of left and right wheel servos so they stop rotating
     def stop():
         leftWheelServo.duty(7.40)
         rightWheelServo.duty(7.40)
@@ -109,56 +108,69 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
     try:
         task = kpu.load(model_addr)
         kpu.init_yolo2(task, 0.5, 0.3, 5, anchors) # threshold:[0,1], nms_value: [0, 1]
+        deskFlag = 0 # flag to determine if we found a desk last time through loop
+
+
         while(True):
-            # Ultasonic Readings
-            # ultrasonicLeft.distance_in()
-            # ultrasonicRight.distance_in()
+            # Grab ultrasonic readings
+            ultraL = ultrasonicLeft.distance_in()
+            ultraR = ultrasonicRight.distance_in()
             # Take screenshot and run yolo2 on image
             img = sensor.snapshot()
             t = time.ticks_ms()
             objects = kpu.run_yolo2(task, img)
             t = time.ticks_ms() - t
 
-            # If we detect a desk
+            # DESK FOUND
             if objects:
-                print("Desk has been detected!!!!!!!!!!")
+                # We got through each desk found in the image, and draw a rectangle around it
+                    # for our purposes and testing, we probably will only have one desk at a time
+                    # LCD will be able to show all desks, but logic will work for one desk
                 for obj in objects:
-                    print(obj)
-                    pos = obj.rect()
+                    pos = obj.rect() # pos variable will hold the last desk obj in 'objects' [x,y,w,h]
                     img.draw_rectangle(pos)
                     img.draw_string(pos[0], pos[1], "%s : %.2f" %(labels[obj.classid()], obj.value()), scale=2, color=(255, 0, 0))
-                    save = img
+
+                # indicates that we currently found a desk, and we found a desk last iteration through while loop
+                    # Logic: use positions of the previous image and the current image to move robot
+                    # Adjust the wheel servos and microservos so robot faces forward at desk
+                if deskFlag:
+                    if scanServo.value >= 48 and scanServo.value <=52: # microservo is close to the center, so we slightly adjust wheels based on the difference in the desk objects
+                        if pos[0] > prevPos[0]:
+                            slightAdjustRight()
+                        elif pos[0] < prevPos[0]:
+                            slightAdjustLeft()
+                        '''
+                        #here will be where we tilt the camera forward
+                        #if nextPos[1] > pos[1]:
+                        #
+                        #elif nextPos[1] < pos[1]:
+                        #
+                        '''
+                        # if pos[2] (width) is greater than 175 pixels, perform some task (clean)
+                        if pos[2] > 175:
+                            stop()
+                            time.sleep(10)
+                        else:
+                            driveForwardSlow()
+                    # scanservo needs to adjust to the center
+                    elif scanServo.value > 52:
+                        slightAdjustRight()
+                        scanServo.drive(-2)
+                    elif scanServo.value < 48:
+                        slightAdjustLeft()
+                        scanServo.drive(2)
+
+                # Set our prevPos variable for the next time through
+                deskFlag = 1 # set flag to 1 for next time through (indicating we are moving toward desk)
+                prevPos = pos
             img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
             lcd.display(img)
-            img = sensor.snapshot()
-            t = time.ticks_ms()
-            objects = kpu.run_yolo2(task, img)
-            t = time.ticks_ms() - t
-            if objects:
-                for obj in objects:
-                    nextPos = obj.rect()
-                if scanServo.value >= 48 and scanServo.value <=52:
-                    if nextPos[0] > pos[0]:
-                        slightAdjustRight()
-                    elif nextPos[0] < pos[0]:
-                        slightAdjustLeft()
-                    #here will be where we tilt the camera forward
-                    #if nextPos[1] > pos[1]:
-                    #
-                    #elif nextPos[1] < pos[1]:
-                    #
-                    if nextPos[2] > 175:
-                        stop()
-                        time.sleep(10)
-                    else:
-                        driveForwardSlow()
-                elif scanServo.value > 52:
-                    slightAdjustRight()
-                    scanServo.drive(-2)
-                elif scanServo.value < 48:
-                    slightAdjustLeft()
-                    scanServo.drive(2)
+
+
+            # NO DESK FOUND- increment microservo, get ultrasonic readings, move wheel servos
             else:
+                deskFlag = 0
                 # Increment the scan servo
                 scanServo.drive(increment)
                 # Modify the increment value if necessary
@@ -168,15 +180,15 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
                     increment = 1
 
                 # Control Robot based on ultrasonic readings
-                if(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
+                if(ultraR>0 and ultraR<9 and ultraL>0 and ultraL<9):
                     stop()
                     time.sleep_ms(500)
                     turnRight()
-                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
+                elif(ultraR>0 and ultraR>9 and ultraL>0 and ultraL>9):
                     driveForward()
-                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
+                elif(ultraR>0 and ultraR<9 and ultraL>0 and ultraL>9):
                     turnLeft()
-                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
+                elif(ultraR>0 and ultraR>9 and ultraL>0 and ultraL<9):
                     turnRight()
 
 
