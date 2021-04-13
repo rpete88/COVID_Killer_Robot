@@ -151,7 +151,8 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
                 t = time.ticks_ms()
                 objects = kpu.run_yolo2(task, img)
                 t = time.ticks_ms() - t
-                while not objects:
+                i = 0
+                while (not objects) and (i < 20):
                     img = sensor.snapshot()
                     t = time.ticks_ms()
                     objects = kpu.run_yolo2(task, img)
