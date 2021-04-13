@@ -157,6 +157,7 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
                     t = time.ticks_ms()
                     objects = kpu.run_yolo2(task, img)
                     t = time.ticks_ms() - t
+                    i += 1
                 if objects:
                     driveForward()
                     time.sleep(10)
