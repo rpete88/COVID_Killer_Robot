@@ -3,11 +3,10 @@
 # This file should be renamed to boot.py and placed into root directory of the SD Card
 # m.kmodel, servo.py, ultra.py, labels.txt, and startup.jpg should also be in root directory of SD Card
 
-PWMLOW = 4.3
-PWMHIGH = 10
+PWMLOW = 3.0
+PWMHIGH = 8.3
 
 from machine import Timer, PWM
-#from fpioa_manager import board_info
 from fpioa_manager import fm
 from Maix import GPIO
 from board import board_info
@@ -50,10 +49,10 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
 
     leftWheelServo = PWM(tim0, freq = 50, duty = 7.32, pin = 14) #pin 8
     rightWheelServo = PWM(tim1, freq = 50, duty = 7.4, pin = 13) #pin 9
-    scanPWM = PWM(tim2, freq=50, duty=0, pin = 15) # find a pin to use
+    scanPWM = PWM(tim2, freq=50, duty=0, pin = 15) # pin 7
 
     scanServo = Servo(scanPWM, dir=80)
-    increment = 1 # value to increment the microservo (unit is degrees)
+    increment = 5 # value to increment the microservo (unit is degrees)
 
     '''
     Functions to control servos
@@ -61,16 +60,19 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
     def turnRight():
         leftWheelServo.duty(PWMHIGH)
         rightWheelServo.duty(PWMHIGH)
+        print("turn Right")
         time.sleep_ms(500)
 
     def turnLeft():
         leftWheelServo.duty(PWMLOW)
         rightWheelServo.duty(PWMLOW)
+        print("Turn Left")
         time.sleep_ms(500)
 
     def driveForward():
         leftWheelServo.duty(PWMHIGH)
         rightWheelServo.duty(PWMLOW)
+        print("drive forward")
 
     def driveForwardSlow():
         leftWheelServo.duty(9)
@@ -78,15 +80,24 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
 
     def slightAdjustRight():
         leftWheelServo.duty(PWMHIGH)
-        rightWheelServo.duty(PWMHIGH)
+        rightWheelServo.duty(7.40)
+        print("slight right")
+        time.sleep_ms(50)
 
     def slightAdjustLeft():
-        leftWheelServo.duty(PWMLOW)
+        leftWheelServo.duty(7.40)
         rightWheelServo.duty(PWMLOW)
+        print("slight left")
+        time.sleep_ms(50)
 
-    def stop():
+    def ServoStop():
         leftWheelServo.duty(7.40)
         rightWheelServo.duty(7.40)
+        print("stop")
+
+    def BackUp():
+        leftWheelServo.duty(7)
+        rightWheelServo.duty(PWMHIGH)
 
 
     if not labels:
@@ -118,66 +129,85 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
             t = time.ticks_ms()
             objects = kpu.run_yolo2(task, img)
             t = time.ticks_ms() - t
-
             # If we detect a desk
             if objects:
                 print("Desk has been detected!!!!!!!!!!")
+                ServoStop()
                 for obj in objects:
                     print(obj)
                     pos = obj.rect()
                     img.draw_rectangle(pos)
                     img.draw_string(pos[0], pos[1], "%s : %.2f" %(labels[obj.classid()], obj.value()), scale=2, color=(255, 0, 0))
                     save = img
-            img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
-            lcd.display(img)
-            img = sensor.snapshot()
-            t = time.ticks_ms()
-            objects = kpu.run_yolo2(task, img)
-            t = time.ticks_ms() - t
-            if objects:
-                for obj in objects:
-                    nextPos = obj.rect()
-                if scanServo.value >= 48 and scanServo.value <=52:
-                    if nextPos[0] > pos[0]:
-                        slightAdjustRight()
-                    elif nextPos[0] < pos[0]:
+                img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
+                lcd.display(img)
+                if scanServo.value > 52:
+                    while scanServo.value > 52:
+                        scanServo.drive(-2)
                         slightAdjustLeft()
-                    #here will be where we tilt the camera forward
-                    #if nextPos[1] > pos[1]:
-                    #
-                    #elif nextPos[1] < pos[1]:
-                    #
-                    if nextPos[2] > 175:
-                        stop()
-                        time.sleep(10)
-                    else:
-                        driveForwardSlow()
-                elif scanServo.value > 52:
-                    slightAdjustRight()
-                    scanServo.drive(-2)
                 elif scanServo.value < 48:
-                    slightAdjustLeft()
-                    scanServo.drive(2)
+                    while scanServo.value < 48:
+                        scanServo.drive(2)
+                        slightAdjustRight()
+                ServoStop()
+                img = sensor.snapshot()
+                t = time.ticks_ms()
+                objects = kpu.run_yolo2(task, img)
+                t = time.ticks_ms() - t
+                i = 0
+                while (not objects) and (i < 20):
+                    img = sensor.snapshot()
+                    t = time.ticks_ms()
+                    objects = kpu.run_yolo2(task, img)
+                    t = time.ticks_ms() - t
+                    i += 1
+                if objects:
+                    for obj in objects:
+                        print(obj)
+                        pos = obj.rect()
+                        img.draw_rectangle(pos)
+                        img.draw_string(pos[0], pos[1], "%s : %.2f" %(labels[obj.classid()], obj.value()), scale=2, color=(255, 0, 0))
+                        save = img
+                    img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
+                    lcd.display(img)
+                    if pos[2] < 215 and pos[3] < 215:
+                        driveForward()
+                        time.sleep(13)
+                    else:
+                        driveForward()
+                        time.sleep(7)
+                    ServoStop()
+                    time.sleep(10)
+                    BackUp()
+                    time.sleep(2)
+                    turnRight()
+                    time.sleep_ms(500)
             else:
                 # Increment the scan servo
                 scanServo.drive(increment)
                 # Modify the increment value if necessary
                 if (scanServo.value == 100 ):
-                    increment = -1
+                    increment = -2
                 if (scanServo.value == 0 ):
-                    increment = 1
+                    increment = 2
 
                 # Control Robot based on ultrasonic readings
                 if(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
-                    stop()
+                    ServoStop()
                     time.sleep_ms(500)
                     turnRight()
-                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
+                    print("ultrasonic Right: ", ultrasonicRight.distance_in())
+                    print("ultrasonic Left: ", ultrasonicLeft.distance_in())
+                elif((ultrasonicRight.distance_in()<0 or ultrasonicRight.distance_in()>9) and (ultrasonicLeft.distance_in()<0 or ultrasonicLeft.distance_in()>9)):
                     driveForward()
-                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()>9):
+                elif((ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()<9) and (ultrasonicLeft.distance_in()<0 or ultrasonicLeft.distance_in()>9)):
                     turnLeft()
-                elif(ultrasonicRight.distance_in()>0 and ultrasonicRight.distance_in()>9 and ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9):
+                    print("ultrasonic Right: ", ultrasonicRight.distance_in())
+                    print("ultrasonic Left: ", ultrasonicLeft.distance_in())
+                elif((ultrasonicRight.distance_in()<0 or ultrasonicRight.distance_in()>9) and (ultrasonicLeft.distance_in()>0 and ultrasonicLeft.distance_in()<9)):
                     turnRight()
+                    print("ultrasonic Right: ", ultrasonicRight.distance_in())
+                    print("ultrasonic Left: ", ultrasonicLeft.distance_in())
 
 
     except Exception as e:
